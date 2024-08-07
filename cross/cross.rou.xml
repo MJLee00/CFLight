@@ -1,0 +1,32 @@
+<routes>
+        <vType id="typePassenger"  jmIgnoreJunctionFoeProb ="0.4" carFollowModel="Krauss" accel="1.0" decel="4.5" sigma="0.5" length="5" minGap="1" maxSpeed="13.9" guiShape="passenger" >
+
+        </vType>
+<!--		<vType id="DEFAULT_VEHTYPE" vClass="passenger" lcKeepRight="300" jmIgnoreFoeProb="1" jmSigmaMinor="1" emergencyDecel="1" apparentDecel="1"/>-->
+<!--		<vType id="t_0" vClass="passenger" jmDriveAfterRedTime="300" jmIgnoreFoeProb="1" jmSigmaMinor="1" emergencyDecel="1" apparentDecel="1"/>-->
+        <route id="right-right"  edges="1i 2o" />
+        <route id="up-up"  edges="3i 4o" />
+        <route id="left-left"  edges="2i 1o" />
+        <route id="down-down"  edges="4i 3o" />
+        <route id="up-left"  edges="3i 1o" />
+        <route id="down-right"  edges="4i 2o" />
+    
+<!--    <flow id="f_2" begin="0.00" departSpeed="13.90" from="3i" to="4o" end="50.00" probability="1.00"/>-->
+<!--    <trip id="t_0" type="t_0" depart="0.00" departSpeed="13.90" from="2i" to="1o"/>-->
+<!--    <trip id="t_1" type="t_0" depart="0.00" departSpeed="13.90" from="2i" to="3o"/>-->
+<!--    <trip id="t_2" type="t_0" depart="0.00" departSpeed="13.96" from="2i" to="3o"/>-->
+<!--    <trip id="t_3" type="t_0" depart="0.00" departSpeed="13.90" from="2i" to="3o"/>-->
+<!--    <trip id="t_4" type="t_0" depart="0.00" departSpeed="13.90" from="2i" to="3o"/>-->
+
+	<flow id="type1" color="1,1,0"  begin="50" end= "3600" probability="0.1" type="typePassenger" route="right-right" />
+
+	<flow id="type2" color="1,1,0"  begin="50" end= "3600" probability="0.1" type="typePassenger" route="up-up" />
+
+	<flow id="type3" color="1,1,0"  begin="50" end= "3600" probability="0.1" type="typePassenger" route="left-left" />
+
+	<flow id="type4" color="1,1,0"  begin="50" end= "3600" probability="0.1" type="typePassenger" route="down-down" />
+
+	<flow id="type5" color="1,1,0"  begin="50" end= "3600" probability="0.05" type="typePassenger" route="up-left" />
+
+	<flow id="type6" color="1,1,0"  begin="50" end= "3600" probability="0.05" type="typePassenger" route="down-right" />
+</routes>

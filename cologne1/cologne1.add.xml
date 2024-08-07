@@ -1,0 +1,22 @@
+<additional>
+	<tlLogic id="0" type="static" programID="1" offset="0">
+		<phase duration="29" state="rrrrrGGGrrrrrrrGGGrr" minDur="5" maxDur="50"/>
+		<phase duration="5" state="rrrrryyyrrrrrrryyyrr"/>
+		<phase duration="6" state="rrrrrrrrGGrrrrrrrrGG" minDur="5" maxDur="50"/>
+		<phase duration="5" state="rrrrrrrryyrrrrrrrryy"/>
+		<phase duration="29" state="GGGggrrrrrGGGggrrrrr" minDur="5" maxDur="50"/>
+		<phase duration="5" state="yyyggrrrrryyyggrrrrr"/>
+		<phase duration="6" state="rrrGGrrrrrrrrGGrrrrr" minDur="5" maxDur="50"/>
+		<phase duration="5" state="rrryyrrrrrrrryyrrrrr"/>
+	</tlLogic>
+	<tlLogic id="0" type="static" programID="2" offset="0">
+		<phase duration="29" state="rrrrrGGGrrrrrrrGGGrr" minDur="5" maxDur="50"/>
+		<phase duration="5" state="rrrrryyyrrrrrrryyyrr"/>
+		<phase duration="6" state="rrrrrrrrGGrrrrrrrrGG" minDur="5" maxDur="50"/>
+		<phase duration="5" state="rrrrrrrryyrrrrrrrryy"/>
+		<phase duration="29" state="GGGrrrrrrrGGGrrrrrrr" minDur="5" maxDur="50"/>
+		<phase duration="5" state="yyyrrrrrrryyyrrrrrrr"/>
+		<phase duration="6" state="rrrGGrrrrrrrrGGrrrrr" minDur="5" maxDur="50"/>
+		<phase duration="5" state="rrryyrrrrrrrryyrrrrr"/>
+	</tlLogic>
+</additional>

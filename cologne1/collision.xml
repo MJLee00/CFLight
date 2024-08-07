@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-08-06 06:58:57 by Eclipse SUMO sumo Version 1.20.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="cologne1/cologne1.net.xml"/>
+        <route-files value="cologne1/cologne1.rou.xml"/>
+    </input>
+
+    <output>
+        <collision-output value="cologne1/collision.xml"/>
+        <statistic-output value="cologne1/statistic.xml"/>
+    </output>
+
+    <time>
+        <begin value="25200"/>
+        <end value="28800"/>
+        <step-length value="0.5"/>
+    </time>
+
+    <processing>
+        <ignore-accidents value="false"/>
+        <collision.action value="teleport"/>
+        <collision.check-junctions value="true"/>
+        <collision.mingap-factor value="1"/>
+        <waiting-time-memory value="10000"/>
+    </processing>
+
+    <report>
+        <verbose value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+    <traci_server>
+        <remote-port value="45637"/>
+    </traci_server>
+
+    <random_number>
+        <random value="true"/>
+    </random_number>
+
+</configuration>

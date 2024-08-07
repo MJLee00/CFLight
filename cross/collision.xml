@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-08-05 14:36:15 by Eclipse SUMO sumo Version 1.20.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="cross/cross.net.xml"/>
+        <route-files value="cross/cross.rou.xml"/>
+    </input>
+
+    <output>
+        <collision-output value="cross/collision.xml"/>
+        <statistic-output value="cross/statistic.xml"/>
+    </output>
+
+    <time>
+        <begin value="0"/>
+        <end value="10000"/>
+        <step-length value="0.5"/>
+    </time>
+
+    <processing>
+        <ignore-accidents value="false"/>
+        <collision.action value="teleport"/>
+        <collision.check-junctions value="true"/>
+        <collision.mingap-factor value="1"/>
+        <waiting-time-memory value="10000"/>
+    </processing>
+
+    <report>
+        <verbose value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+    <traci_server>
+        <remote-port value="43609"/>
+    </traci_server>
+
+    <random_number>
+        <random value="true"/>
+    </random_number>
+
+    <gui_only>
+        <gui-settings-file value="cross/gui_setting.xml"/>
+    </gui_only>
+
+</configuration>
+-->
+
+<collisions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/collision_file.xsd">
+</collisions>
