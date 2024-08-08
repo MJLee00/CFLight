@@ -29,7 +29,7 @@ import datetime
 from CTC import *
 from SCM import *
 
-net_type = 1
+net_type = 0
 
 # The parameters
 batch_size = 128  # How many experiences to use for each training step.
@@ -47,6 +47,7 @@ path = "./dqn"  # The path to save our model to.
 h_size = 64  # The size of the final convolutional layer before splitting it into Advantage and Value streams.
 tau = 0.001  # Rate to update target network toward primary network
 DEFAULT_PORT = 8813
+safe_weight = 5
 
 # TODO: 
 # 路网1是sync，0是cologne
@@ -90,8 +91,9 @@ def updateTarget(op_holder, sess):
 def reset(is_analysis=False, sumocfg_file=sumocfg_file):
     if is_analysis:
         sumocfg_file = "cross/cross_wooutput.sumocfg"
-    command = [checkBinary('sumo'), '-c', sumocfg_file]
+    command = [checkBinary('sumo'), '-c', sumocfg_file, '--no-warnings', 'True']
     traci.start(command)
+
     tls = traci.trafficlight.getIDList()
     traci.trafficlight.setProgram(tls[0], '0')
     return tls
@@ -112,12 +114,14 @@ def state():
             if ps[0] < 11700 or ps[0] > 12000 or ps[1] < 13200 or ps[1] > 13500:
                 continue
             spd = p[x][tc.VAR_SPEED]
-            p_state[int((ps[0] - 11700)/ 5), int((ps[1]-13200) / 5)] = [1, int(round(spd))]
+            p_state[int((ps[0] - 11700)/ 5), int((ps[1]-13200) / 5)] = [1, int(round(spd)/20)]
         elif net_type == 1:
             ps = p[x][tc.VAR_POSITION]
             spd = p[x][tc.VAR_SPEED]
-            p_state[int((ps[0])/ 5), int((ps[1]) / 5)] = [1, int(round(spd))]
+            p_state[int((ps[0])/ 5), int((ps[1]) / 5)] = [1, int(round(spd)/20)]
     p_state = np.reshape(p_state, [-1, 3600, 2])
+
+   
     return p_state 
 
 
@@ -161,23 +165,18 @@ def action(round_count, tls, act, wait_time):  # parameters: the phase duration 
                     ps = traci.vehicle.getPosition(veh_id)
                     wait_time_map[veh_id] = traci.vehicle.getAccumulatedWaitingTime(veh_id)
         
-        for veh_id in traci.vehicle.getIDList():
-            traci.vehicle.subscribe(veh_id, (tc.VAR_POSITION, tc.VAR_SPEED, tc.VAR_ACCUMULATED_WAITING_TIME))
-        p = traci.vehicle.getAllSubscriptionResults()
-
         wait_temp = dict(wait_time_map)
-        for x in p:
+        for veh_id in traci.vehicle.getIDList():
+            ps = traci.vehicle.getPosition(veh_id)
+            spd = traci.vehicle.getSpeed(veh_id)/20
             # TODO: 
             # 改变路网需要改变p_state
             if net_type == 0:
-                ps = p[x][tc.VAR_POSITION]
+               
                 if ps[0] < 11700 or ps[0] > 12000 or ps[1] < 13200 or ps[1] > 13500:
                     continue
-                spd = p[x][tc.VAR_SPEED]
                 p_state[int((ps[0] - 11700)/ 5), int((ps[1]-13200) / 5)] = [1, int(round(spd))]
             elif net_type == 1:
-                ps = p[x][tc.VAR_POSITION]
-                spd = p[x][tc.VAR_SPEED]
                 p_state[int((ps[0])/ 5), int((ps[1]) / 5)] = [1, int(round(spd))]
 
         wait_t = sum(wait_temp[x] for x in wait_temp)
@@ -186,10 +185,11 @@ def action(round_count, tls, act, wait_time):  # parameters: the phase duration 
         if traci.simulation.getMinExpectedNumber() == 0:
             d = True
 
-        r = wait_time - wait_t - collisions * 500
+        r = (wait_time - wait_t)/500 - collisions/safe_weight 
         p_state_tmp = np.reshape(p_state, [-1, 3600, 2])
 
-    return p_state_tmp, r, d, wait_t, collision_phase, collisions,  wait_time - wait_t
+        
+    return p_state_tmp, r, d, wait_t, collision_phase, collisions/safe_weight,  (wait_time - wait_t)/500
 
 
 
@@ -273,18 +273,18 @@ for i in range(1, num_episodes):
             a = sess.run(mainQN.predict, feed_dict={mainQN.scalarInput: s})[0]
 
         s1, r, d, wait_time, collision_ph, collisions, r_eff = action(i, tls, a, wait_time)
-        if d == True:
-            clear_collision_info_plus()
-        if collisions > 0:
-            collect_collision_info_plus((s,a,r,s1,collisions))
-            result_list = collect_counterfactual_collision_info(generator, generator_ef, generator_coli)   
-            if len(result_list) != 0:
-                for obj in result_list:
-                    # 找到前一个state的索引，替换
-                    episodeBuffer0.add(np.reshape(np.array([obj['state'], obj['action'],
-                                 obj['reward'], obj['next_state'], obj['is_state_terminal'], obj['r_ef'], obj['colli'] ]),
-                                            [1, 7]))  
-            clear_collision_info_plus()
+
+        if i > 50:
+            if collisions > 0:
+                collect_collision_info_plus((s,a,r,s1,collisions))
+                result_list = collect_counterfactual_collision_info(generator, generator_ef, generator_coli)   
+                if len(result_list) != 0:
+                    for obj in result_list:
+                        # 找到前一个state的索引，替换
+                        episodeBuffer0.add(np.reshape(np.array([obj['state'], obj['action'],
+                                    obj['reward'], obj['next_state'], obj['is_state_terminal'], obj['r_ef'], obj['colli'] ]),
+                                                [1, 7]))  
+                clear_collision_info_plus()
                                             
         collision_count += collisions
         total_steps += 1
@@ -292,6 +292,7 @@ for i in range(1, num_episodes):
                                       [1, 7]))  # Save the experience to our episode buffer.
        
         if total_steps > pre_train_steps:
+            #myBuffer0.add(episodeBuffer0.buffer)
             trainBatch = myBuffer0.priorized_sample(batch_size)  # Get a random batch of experiences.
             gan_batch = np.vstack(trainBatch[:, 0])
             train_gan([np.vstack(gan_batch[:, 0]), np.eye(20)[np.vstack(gan_batch[:,1])].squeeze(),
@@ -353,7 +354,7 @@ for i in range(1, num_episodes):
     tmp = [x for x in wait_time_map if wait_time_map[x] > 1]
     nList.append(len(tmp) / len(wait_time_map))
 
-    log = {'collisions': collision_count/2,
+    log = {'collisions': (collision_count*safe_weight)/2,
            'step': total_steps,
            'episode_steps': j,
            'reward': rAll,
@@ -369,7 +370,7 @@ for i in range(1, num_episodes):
     if net_type == 1:
         df.to_csv('train_log_acyclic_R_500_sync.csv')
     elif net_type == 0:
-        df.to_csv('train_log_acyclic_R_500.csv')
+        df.to_csv('train_log_acyclic_R_500_safeweight5.csv')
     
     end()
     myBuffer0.add(episodeBuffer0.buffer)

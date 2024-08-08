@@ -6,7 +6,8 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 
 # 设置随机种子以确保可重复性
 np.random.seed(42)
-
+def negative_relu(x):
+    return tf.minimum(0.0, x)
 # 生成器模型
 def build_generator(network_type):
     input_1 = layers.Input(shape=(3600, 2))
@@ -37,6 +38,7 @@ def build_generator(network_type):
         x = layers.ReLU()(x)
 
         x = layers.Dense(1)(x)
+        x = negative_relu(x)
     elif network_type == 2:
         x = layers.Dense(200)(x)
         x = layers.BatchNormalization()(x)
@@ -109,9 +111,7 @@ def create_gan(network_type=0):
     # 编译判别器
     discriminator.compile(loss=losses.binary_crossentropy, optimizer=optimizers.Adam(learning_rate=0.0002, beta_1=0.5), metrics=['accuracy'])
 
-    # 构建并编译GAN模型
-    discriminator.trainable = False
-
+   
     gan_input = [layers.Input(shape=(3600,2)), layers.Input(shape=(20)),layers.Input(shape=(3600,2))]
     generated_vectors = generator(gan_input)
     gan_output = discriminator(generated_vectors)
@@ -126,12 +126,14 @@ def train_gan(batch, real_vectors, gan, discriminator, generator, epochs=1, batc
     for epoch in range(epochs):
 
         generated_vectors = generator.predict(batch)
-
+        
         # 训练判别器
         d_loss_real = discriminator.train_on_batch(real_vectors, np.ones((batch_size, 1)))
         d_loss_fake = discriminator.train_on_batch(generated_vectors, np.zeros((batch_size, 1)))
         d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
 
+
+        
         
         # 训练生成器
         g_loss = gan.train_on_batch(batch, np.ones((batch_size, 1)))

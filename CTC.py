@@ -46,7 +46,7 @@ def collect_counterfactual_collision_info(generator, generator_ef, generator_col
   
         result_list.append({'state':  s,
                             'action':  int(counter_a/2),
-                            'reward': r_ef+ (actual_collision_count-collision)*500,
+                            'reward': r_ef + (actual_collision_count-0),
                             'next_state' : next_state,
                             'is_state_terminal': False,
                             'r_ef': r_ef,
