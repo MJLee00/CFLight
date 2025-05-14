@@ -78,4 +78,4 @@ class Qnetwork(nn.Module):
         # Combine to get Q-values
         Qout = Value + (Advantage - Advantage.mean(dim=1, keepdim=True))
         
-        return Qout  
+        return Qout, Advantage

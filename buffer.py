@@ -7,9 +7,7 @@ import time
 import numpy
 import numpy as np
 import random
-import tensorflow as tf
-import tensorflow.contrib.slim as slim
-# import matplotlib.pyplot as plt
+
 import os
 import scipy.stats as ss
 import math
@@ -35,7 +33,9 @@ class priorized_experience_buffer():
 
     def updateErr(self, indx, error):
         for i in range(0, len(indx)):
-            self.err[indx[i]] = math.sqrt(error[i])
+            # 使用绝对值并确保值为正数
+            error_value = abs(error[i])
+            self.err[indx[i]] = math.sqrt(error_value)
         r_err = ss.rankdata(self.err)  # rank of the error from smallest (1) to largest
         self.prob = [1 / (len(r_err) - i + 1) for i in r_err]
 
@@ -54,7 +54,13 @@ class priorized_experience_buffer():
             for j in range(0, len(t_s)):
                 if t_s[j] > tmp:
                     smp_set.add(max(j - 1, 0))
-                    break;
-        for i in smp_set:
-            batch.append([self.buffer[i], i])
-        return np.array(batch)
+                    break
+                    
+        # 创建一个结构化数组来存储不同形状的数据
+        dtype = [('experience', object), ('index', int)]
+        batch = np.zeros(len(smp_set), dtype=dtype)
+        
+        for i, idx in enumerate(smp_set):
+            batch[i] = (self.buffer[idx], idx)
+            
+        return batch

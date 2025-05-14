@@ -1,0 +1,12 @@
+*.out
+*.csv
+*.pth
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.sv
